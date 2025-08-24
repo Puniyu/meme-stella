@@ -1,7 +1,7 @@
 [package]
 name = "meme_stella"
 description = "Meme generator extra memes"
-version = "0.0.1"
+version = "0.1.1"
 authors = ["3369906077 <3369906077@qq.com>"]
 license = "MIT"
 readme = "README.md"
