@@ -1,0 +1,27 @@
+[package]
+name = "meme_stella"
+description = "Meme generator extra memes"
+version = "0.0.1"
+authors = ["3369906077 <3369906077@qq.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/Puniyu/meme-stella"
+repository = "https://github.com/Puniyu/meme-stella"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+inventory = "0.3"
+serde = "1.0"
+skia-safe = { version = "0.80", features = ["textlayout"] }
+
+meme_generator_core = "0.0.4"
+meme_generator_utils = "0.0.8"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
