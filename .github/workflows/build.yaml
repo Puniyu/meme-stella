@@ -1,0 +1,119 @@
+name: Build Package
+
+on:
+  workflow_call:
+
+env:
+  APP_NAME: meme_stella
+
+jobs:
+  build_windows:
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      matrix:
+        platform:
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x86_64
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 rust
+        uses: dtolnay/rust-toolchain@1.88.0
+
+      - name: 设置 rust 缓存
+        uses: swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ env.APP_NAME }}
+
+      - name: 添加目标平台
+        run: rustup target add ${{ matrix.platform.target }}
+
+      - name: 构建
+        run: cargo build --release --target ${{ matrix.platform.target }}
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ env.APP_NAME }}-${{ matrix.platform.label }}"
+          path: |
+            target/${{ matrix.platform.target }}/release/*.dll
+
+  build_macos:
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      matrix:
+        platform:
+          - runner: macos-latest
+            target: x86_64-apple-darwin
+            label: macos-x86_64
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            label: macos-aarch64
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 rust
+        uses: dtolnay/rust-toolchain@1.88.0
+
+      - name: 设置 rust 缓存
+        uses: swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ env.APP_NAME }}
+
+      - name: 添加目标平台
+        run: rustup target add ${{ matrix.platform.target }}
+
+      - name: 构建
+        run: cargo build --release --target ${{ matrix.platform.target }}
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ env.APP_NAME }}-${{ matrix.platform.label }}"
+          path: |
+            target/${{ matrix.platform.target }}/release/*.dylib
+
+  build_linux:
+    runs-on: ${{ matrix.platform.runner }}
+    container: ${{ matrix.platform.container }}
+    strategy:
+      matrix:
+        platform:
+          - runner: ubuntu-latest
+            container: ghcr.io/memecrafters/meme-generator-build-container:latest
+            target: x86_64-unknown-linux-gnu
+            label: linux-x86_64
+          - runner: ubuntu-24.04-arm
+            container: ghcr.io/memecrafters/meme-generator-build-container:arm64
+            target: aarch64-unknown-linux-gnu
+            label: linux-aarch64
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 rust
+        uses: dtolnay/rust-toolchain@1.88.0
+
+      - name: 设置 rust 缓存
+        uses: swatinem/rust-cache@v2
+        with:
+          prefix-key: ${{ env.APP_NAME }}
+
+      - name: 添加目标平台
+        run: rustup target add ${{ matrix.platform.target }}
+
+      - name: 构建
+        run: cargo build --release --target ${{ matrix.platform.target }}
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ env.APP_NAME }}-${{ matrix.platform.label }}"
+          path: |
+            target/${{ matrix.platform.target }}/release/*.so
